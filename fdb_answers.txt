@@ -1,1 +1,7 @@
-In progress!
+Q1: FoundationDB decouples the Transaction Management System (TMS) and Storage System (SS) because they have opposite characteristics and separating them allows for horizontal scaling through more storage servers. Separating the two also lets the TMS focus on confirming log durability rather than waiting for the storage to write. It also enables for FDB's fast recovery because TMS can be stateless and a new one can be elected immediately after any fault. 
+
+Q2: Resolvers are responsible for detecting read-write conflicts between concurrent transactions. The check occurs during the commit phase after the proxy assigned a commit version but before the transactions is written to the logs. The Resolver compares the transaction's read set against the write sets of transactions that have committed in between the requester's read version and commit version.
+
+Q3: The read version is a timestamp that tells the storage servers which snapshot of the database the current transaction should see. This allows the user to see data that is consistent. This is fundamental to FDB’s consistency guarantee, as it prevents the transaction from seeing any partial or uncommitted updates from other processes. The read version also defines the conflict window the Resolver must check - aborting if a transaction's read set was modified by another transaction committed between the read and commit versions.
+
+Q4: 
