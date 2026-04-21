@@ -4,4 +4,6 @@ Q2: Resolvers are responsible for detecting read-write conflicts between concurr
 
 Q3: The read version is a timestamp that tells the storage servers which snapshot of the database the current transaction should see. This allows the user to see data that is consistent. This is fundamental to FDB’s consistency guarantee, as it prevents the transaction from seeing any partial or uncommitted updates from other processes. The read version also defines the conflict window the Resolver must check - aborting if a transaction's read set was modified by another transaction committed between the read and commit versions.
 
-Q4: 
+Q4: Standard reads add read conflict ranges and are tracked by the Resolvers to ensure no other transaction modifies that data before the current one commits, whereas snapshot reads do not add conflict ranges - so they avoid conflicts at the risk of reading stale data. You would choose a snapshot read when you need to perform an aggregation or a long-running read where you don't want the transaction to fail just because a small piece of underlying data was updated by someone else.
+
+Q5: Recovery is "cheap" because the LogServers serve as an immediate source of truth, holding the redo log in memory and on disk before data is even moved to the StorageServers. In the event of a crash, the new transaction system created only needs to identify the end of the log across the LogServers to reach a consistent state, rather than waiting for the StorageServers to replay the data.
